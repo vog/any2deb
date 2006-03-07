@@ -1,0 +1,140 @@
+#!/bin/sh
+
+#-----------------------------------------------------------------------
+# Copyright (C) 2006  Volker Grabsch
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#
+#   * Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in
+#     the documentation and/or other materials provided with the
+#     distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#-----------------------------------------------------------------------
+
+
+# syntax check
+#
+
+if test -z "$1" -o -z "$2" -o -z "$3" -o -z "$4"
+then
+    echo
+    echo "    any2deb - 1.0"
+    echo "    ============="
+    echo
+    echo
+    echo "Syntax:"
+    echo "    $0 <package> <version> <source> <prefix> [<alien options>]"
+    echo
+    echo "Requires:"
+    echo "    alien, fakeroot, find, [unzip, tar, gzip, bzip2]"
+    echo
+    echo "Examples:"
+    echo "    $0 mingw32-zlib 1.2.3 zlib-1.2.3-lib.zip /usr/i586-mingw32msvc"
+    echo
+    echo "    $0 mplayer-codecs-essential 20050412 \\"
+    echo "        essential-20050412.tar.bz2 /usr/lib/codecs"
+    exit 1
+fi
+
+
+# read parameters
+#
+
+PACKAGE="$1"
+VERSION="$2"
+SOURCE="$3"
+PREFIX="./$4"
+
+if test -n "$5"
+then
+    ALIEN_OPTS="$5"
+else
+    ALIEN_OPTS="-d"
+fi
+
+BUILD="build-$PACKAGE"
+TGZPACKAGE="$PACKAGE-$VERSION.tgz"
+
+
+# initialize build folder
+#
+
+rm -rf "$BUILD"
+mkdir "$BUILD"
+mkdir "$BUILD/source"
+mkdir "$BUILD/dest"
+
+
+# unpack source package
+#
+
+case "$SOURCE" in
+    *.zip)
+        unzip "$SOURCE" -d "$BUILD/source"
+        ;;
+    *.tar)
+        tar -xv -f "$SOURCE" -C "$BUILD/source"
+        ;;
+    *.tgz|*.tar.gz)
+        tar -xvz -f "$SOURCE" -C "$BUILD/source"
+        ;;
+    *.tar.bz2)
+        tar -xvj -f "$SOURCE" -C "$BUILD/source"
+        ;;
+    *)
+        echo "unsupported file extension of source archive:"
+        echo "    $SOURCE"
+        exit 1
+        ;;
+esac
+
+
+# determine real source folder
+#
+
+BUILD_SOURCE="$BUILD/source"
+SUBDIRS=`find "$BUILD_SOURCE" -type d -mindepth 1`
+if test -n "$SUBDIRS" -a "`echo "$SUBDIRS" | wc -l`" = 1
+then
+    BUILD_SOURCE="$SUBDIRS"
+fi
+
+
+# build destination tree
+#
+
+BUILD_DEST="$BUILD/dest/$PREFIX"
+mkdir -p "$BUILD_DEST"
+rmdir "$BUILD_DEST"
+mv "$BUILD_SOURCE" "$BUILD_DEST"
+
+
+# build debian package
+#
+
+tar -cvz -f "$BUILD/$TGZPACKAGE" -C "$BUILD/dest" .
+fakeroot alien $ALIEN_OPTS --fixperms "$BUILD/$TGZPACKAGE"
+
+
+# remove build folder
+#
+
+rm -rf "$BUILD"
