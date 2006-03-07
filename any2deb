@@ -51,6 +51,9 @@ then
     echo
     echo "    $0 mplayer-codecs-essential 20050412 \\"
     echo "        essential-20050412.tar.bz2 /usr/lib/codecs"
+    echo
+    echo "    $0 any2deb 1.0 any2deb.tar /usr/bin \"-d -r\""
+    echo
     exit 1
 fi
 
