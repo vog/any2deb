@@ -5,7 +5,7 @@ chmod 755 any2deb
 VERSION=`./any2deb | grep "any2deb" | head -1 | cut -d- -f2`
 VERSION=`echo $VERSION`
 
-tar -cfv any2deb.tar any2deb
+tar -cv -f any2deb.tar any2deb
 ./any2deb \
     any2deb \
     "$VERSION" \
