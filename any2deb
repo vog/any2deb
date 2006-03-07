@@ -33,11 +33,13 @@
 
 if test -z "$1" -o -z "$2" -o -z "$3" -o -z "$4"
 then
+    VERSION="1.0"
+    DESCRIPTION="Create Debian packages out of ZIP and TAR files using alien."
     echo
-    echo "    any2deb - 1.0"
+    echo "    any2deb - $VERSION"
     echo "    ============="
     echo
-    echo "Create DEB packages out of ZIP and TAR files using \"alien\"."
+    echo "$DESCRIPTION"
     echo
     echo
     echo "Syntax:"
@@ -52,7 +54,8 @@ then
     echo "    $0 mplayer-codecs-essential 20050412 \\"
     echo "        essential-20050412.tar.bz2 /usr/lib/codecs"
     echo
-    echo "    $0 any2deb 1.0 any2deb.tar /usr/bin \"-d -r\""
+    echo "    $0 any2deb $VERSION any2deb.tar /usr/bin -d -r --description \\"
+    echo "        \"$DESCRIPTION\""
     echo
     exit 1
 fi
@@ -66,12 +69,7 @@ VERSION="$2"
 SOURCE="$3"
 PREFIX="./$4"
 
-if test -n "$5"
-then
-    ALIEN_OPTS="$5"
-else
-    ALIEN_OPTS="-d"
-fi
+shift 4  # alien options are now in $@
 
 BUILD="build-$PACKAGE"
 TGZPACKAGE="$PACKAGE-$VERSION.tgz"
@@ -133,8 +131,8 @@ mv "$BUILD_SOURCE" "$BUILD_DEST"
 # build debian package
 #
 
-tar -cvz -f "$BUILD/$TGZPACKAGE" -C "$BUILD/dest" .
-fakeroot alien $ALIEN_OPTS --fixperms "$BUILD/$TGZPACKAGE"
+tar -cvz --owner=root --group=root -f "$BUILD/$TGZPACKAGE" -C "$BUILD/dest" .
+fakeroot alien "$@" --fixperms "$BUILD/$TGZPACKAGE"
 
 
 # remove build folder
