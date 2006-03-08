@@ -28,7 +28,7 @@
 if test -z "$1" -o -z "$2" -o -z "$3" -o -z "$4"
 then
     VERSION="1.0"
-    DESCRIPTION="Create Debian packages out of ZIP and TAR files using alien."
+    DESCRIPTION="Create Debian packages from ZIP and TAR files using alien."
     echo
     echo "    any2deb - $VERSION"
     echo "    ============="
