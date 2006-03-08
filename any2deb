@@ -46,7 +46,7 @@ then
     echo "    $0 <package> <version> <source> <prefix> [<alien options>]"
     echo
     echo "Requires:"
-    echo "    alien, fakeroot, find, [unzip, tar, gzip, bzip2]"
+    echo "    fakeroot, alien, findutils, [unzip, tar, gzip, bzip2]"
     echo
     echo "Examples:"
     echo "    $0 mingw32-zlib 1.2.3 zlib-1.2.3-lib.zip /usr/i586-mingw32msvc"
