@@ -52,7 +52,7 @@ then
     echo "    $0 mingw32-zlib 1.2.3 zlib-1.2.3-lib.zip /usr/i586-mingw32msvc"
     echo
     echo "    $0 mplayer-codecs-essential 20050412 \\"
-    echo "        essential-20050412.tar.bz2 /usr/lib/codecs"
+    echo "        essential-20050412.tar.bz2 /usr/lib/codecs --fixperms"
     echo
     echo "    $0 any2deb $VERSION any2deb.tar /usr/bin -d -r --description \\"
     echo "        \"$DESCRIPTION\""
@@ -132,7 +132,7 @@ mv "$BUILD_SOURCE" "$BUILD_DEST"
 #
 
 tar -cvz --owner=root --group=root -f "$BUILD/$TGZPACKAGE" -C "$BUILD/dest" .
-fakeroot alien "$@" --fixperms "$BUILD/$TGZPACKAGE"
+fakeroot alien "$@" "$BUILD/$TGZPACKAGE"
 
 
 # remove build folder
