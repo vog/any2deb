@@ -27,7 +27,7 @@
 
 if test -z "$4"
 then
-VERSION="1.0"
+VERSION="1.1"
 DESCRIPTION="Create Debian packages from ZIP and TAR files using alien."
 cat <<EOF
 
