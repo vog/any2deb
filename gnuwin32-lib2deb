@@ -1,0 +1,211 @@
+#!/bin/sh
+
+#  Copyright (c) 2006  Volker Grabsch <volker-ad@v.notjusthosting.com>
+#
+#  Permission is hereby granted, free of charge, to any person obtaining
+#  a copy of this software and associated documentation files (the
+#  "Software"), to deal in the Software without restriction, including
+#  without limitation the rights to use, copy, modify, merge, publish,
+#  distribute, sublicense, and/or sell copies of the Software, and to
+#  permit persons to whom the Software is furnished to do so, subject
+#  to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be
+#  included in all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+#  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+#  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+# syntax check
+#
+
+if test -z "$5"
+then
+cat <<EOF
+
+    gnuwin32-lib2deb - 1.1
+    ======================
+
+Download a library from GnuWin32 and
+create a Debian package for cross compiling to it.
+
+
+Syntax:
+    gnuwin32-lib2deb <pkgname> <deb-pkgname> <full name> <email> \\
+                     <sf-mirror> [<dpkg-buildpackage options>]
+
+Requires:
+    w3m, debhelper, fakeroot
+
+Example:
+    gnuwin32-lib2deb zlib win32-zlib1-dev "Admin" "root@localhost" \\
+                     heanet -b -uc
+
+EOF
+exit 1
+fi
+
+
+# read parameters
+#
+
+PACKAGE=$1
+DEBPACKAGE=$2
+FULLNAME="$3"
+EMAIL="$4"
+SFMIRROR=$5
+
+shift 5  # dpkg-buildpackage options are now in $@
+
+MIRROR=http://$SFMIRROR.dl.sourceforge.net/sourceforge/gnuwin32
+HOMEPAGE=http://gnuwin32.sourceforge.net/packages/$PACKAGE.htm
+SRCINFO=$PACKAGE-gnuwin32-homepage.txt
+
+
+# download package information
+#
+
+echo downloading: $HOMEPAGE
+w3m -dump -cols 70 $HOMEPAGE >$SRCINFO
+
+echo reading: $SRCINFO
+VERSION=`sed -n 9p $SRCINFO`
+SRCPKG=$PACKAGE-$VERSION-lib.zip
+SRCDIR=win32-$PACKAGE-$VERSION
+
+echo current version of $PACKAGE: $VERSION
+
+
+# download zip package
+#
+
+if test -f $SRCPKG
+then
+    echo "$SRCPKG alreads exists."
+    echo "Nothing to do."
+    exit 0
+else
+    echo downloading: $MIRROR/$SRCPKG
+    w3m -dump_source $MIRROR/$SRCPKG >$SRCPKG || exit 1
+fi
+
+
+# build deb package
+#
+
+echo removing: $SRCDIR/
+rm -rf $SRCDIR
+
+echo creating: $SRCDIR/
+mkdir $SRCDIR || exit 1
+
+echo creating: $SRCDIR/$SRCPKG
+cp $SRCPKG $SRCDIR
+
+echo creating: $SRCDIR/debian/
+mkdir $SRCDIR/debian
+
+echo creating: $SRCDIR/debian/changelog
+cat >$SRCDIR/debian/changelog <<EOF
+win32-$PACKAGE ($VERSION-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- $FULLNAME <$EMAIL>  `date -R`
+
+EOF
+
+echo creating: $SRCDIR/debian/compat
+cat >$SRCDIR/debian/compat <<EOF
+4
+EOF
+
+echo creating: $SRCDIR/debian/control
+cat >$SRCDIR/debian/control <<EOF
+Source: win32-$PACKAGE
+Section: libdevel
+Priority: optional
+Maintainer: $FULLNAME <$EMAIL>
+Build-Depends: debhelper (>= 4.0.0), unzip
+Standards-Version: 3.6.1
+
+Package: $DEBPACKAGE
+Architecture: all
+Depends: mingw32
+Description: `sed -n '5s/[^:]*: //p' $SRCINFO`
+ GnuWin32 port of `sed -n 5p $SRCINFO`
+ .
+`sed -n '13~1 {/^$/q ; s/\(.*\)/ \1/p}' $SRCINFO`
+ .
+ Homepage: $HOMEPAGE
+EOF
+
+echo creating: $SRCDIR/debian/copyright
+cat >$SRCDIR/debian/copyright <<EOF
+This package was debianized by $FULLNAME <$EMAIL> on
+`date -R`.
+
+It was downloaded from: $HOMEPAGE
+EOF
+
+echo creating: $SRCDIR/debian/dirs
+cat >$SRCDIR/debian/dirs <<EOF
+usr/i586-mingw32msv
+EOF
+
+echo creating: $SRCDIR/debian/rules
+cat >$SRCDIR/debian/rules <<EOF
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+UNZIP=unzip
+
+build:
+	dh_testdir
+
+clean:
+	dh_testdir
+	dh_testroot
+
+	dh_clean 
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k 
+	dh_installdirs
+
+	\$(UNZIP) -d debian/$DEBPACKAGE/usr/i586-mingw32msvc $SRCPKG 'include/*' 'lib/*'
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs 
+	dh_installdocs
+	dh_install
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-arch: build install
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
+EOF
+chmod a+x $SRCDIR/debian/rules
+
+cd $SRCDIR
+dpkg-buildpackage -rfakeroot -D "$@" || exit 1
+cd ..
+
+echo removing: $SRCDIR/
+rm -rf $SRCDIR
