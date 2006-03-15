@@ -5,8 +5,16 @@ SRC=any2deb gnuwin32-lib2deb Makefile
 MKDIR=mkdir
 CP=cp -a
 TAR=tar
+INSTALL=install
+
+DESTDIR=/usr/local
+BINDIR=$(DESTDIR)/bin
 
 all:
+
+install:
+	$(INSTALL) -m 0755 any2deb $(BINDIR)/
+	$(INSTALL) -m 0755 gnuwin32-lib2deb $(BINDIR)/
 
 dist: $(PKG).tar.gz
 
