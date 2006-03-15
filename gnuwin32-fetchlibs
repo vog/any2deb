@@ -1,0 +1,75 @@
+#!/bin/sh
+
+#  Copyright (c) 2006  Volker Grabsch <volker-ad@v.notjusthosting.com>
+#
+#  Permission is hereby granted, free of charge, to any person obtaining
+#  a copy of this software and associated documentation files (the
+#  "Software"), to deal in the Software without restriction, including
+#  without limitation the rights to use, copy, modify, merge, publish,
+#  distribute, sublicense, and/or sell copies of the Software, and to
+#  permit persons to whom the Software is furnished to do so, subject
+#  to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be
+#  included in all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+#  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+#  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+cat <<EOF
+
+    gnuwin32-fetchlibs - 1.1
+    ========================
+
+* download the package list from GnuWin32
+* filter for library packages
+* create a template shell script to
+  automatically build their Debian packages
+
+Requires:
+    wget, grep, cut, sort
+
+
+EOF
+
+URL=http://gnuwin32.sourceforge.net/packages.html
+
+echo downloading: gnuwin32-list-packages.html
+wget -nc -O - $URL >gnuwin32-list-packages.html \
+|| { rm -f gnuwin32-list-packages.html; exit 1; }
+
+echo creating: gnuwin32-list-libraries.txt
+cat gnuwin32-list-packages.html \
+| grep -i lib \
+| grep packages \
+| cut -d'<' -f3 \
+| cut -d'/' -f2 \
+| cut -d. -f1 \
+| sort -u \
+>gnuwin32-list-libraries.txt
+
+echo creating: gnuwin32-updateall.sh.templ
+(
+cat <<EOF
+#!/bin/sh
+
+FULLNAME=""
+EMAIL=
+SFMIRROR=
+BUILDPACKAGE="-b -uc -us"
+
+A1="\$FULLNAME" 
+A2="\$EMAIL \$SFMIRROR \$BUILDPACKAGE"
+
+EOF
+cat gnuwin32-list-libraries.txt | while read pkg
+do
+    echo "#gnuwin32-lib2deb $pkg	win32-$pkg-dev	\"\$A1\" \$A2 || exit 1"
+done
+)>gnuwin32-updateall.sh.templ
