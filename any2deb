@@ -25,33 +25,32 @@
 # syntax check
 #
 
-if test -z "$1" -o -z "$2" -o -z "$3" -o -z "$4"
+if test -z "$4"
 then
-    VERSION="1.0"
-    DESCRIPTION="Create Debian packages from ZIP and TAR files using alien."
-    echo
-    echo "    any2deb - $VERSION"
-    echo "    ============="
-    echo
-    echo "$DESCRIPTION"
-    echo
-    echo
-    echo "Syntax:"
-    echo "    $0 <package> <version> <source> <prefix> [<alien options>]"
-    echo
-    echo "Requires:"
-    echo "    fakeroot, alien, findutils, [unzip, tar, gzip, bzip2]"
-    echo
-    echo "Examples:"
-    echo "    $0 mingw32-zlib 1.2.3 zlib-1.2.3-lib.zip /usr/i586-mingw32msvc"
-    echo
-    echo "    $0 mplayer-codecs-essential 20050412 \\"
-    echo "        essential-20050412.tar.bz2 /usr/lib/codecs --fixperms"
-    echo
-    echo "    $0 any2deb $VERSION any2deb.tar /usr/bin -d -r --description \\"
-    echo "        \"$DESCRIPTION\""
-    echo
-    exit 1
+VERSION="1.0"
+DESCRIPTION="Create Debian packages from ZIP and TAR files using alien."
+cat <<EOF
+
+    any2deb - $VERSION
+    =============
+
+$DESCRIPTION
+
+
+Syntax:
+    any2deb <package> <version> <source> <prefix> [<alien options>]
+
+Requires:
+    fakeroot, alien, findutils, [unzip, tar, gzip, bzip2]
+
+Examples:
+    any2deb win32-zlib1-dev 1.2.3 zlib-1.2.3-lib.zip /usr/i586-mingw32msvc
+
+    any2deb mplayer-codecs-essential 20050412 \\
+            essential-20050412.tar.bz2 /usr/lib/codecs --fixperms
+
+EOF
+exit 1
 fi
 
 
