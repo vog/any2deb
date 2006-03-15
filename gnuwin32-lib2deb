@@ -41,7 +41,7 @@ Syntax:
                      <sf-mirror> [<dpkg-buildpackage options>]
 
 Requires:
-    w3m, debhelper, fakeroot
+    w3m, wget, debhelper, fakeroot
 
 Example:
     gnuwin32-lib2deb zlib win32-zlib1-dev "Admin" "root@localhost" \\
@@ -92,7 +92,8 @@ then
     exit 0
 else
     echo downloading: $MIRROR/$SRCPKG
-    w3m -dump_source $MIRROR/$SRCPKG >$SRCPKG || exit 1
+    wget -nc $MIRROR/$SRCPKG \
+    || { rm -f $SRCPKG; exit 1; }
 fi
 
 
