@@ -66,6 +66,8 @@ shift 5  # dpkg-buildpackage options are now in $@
 MIRROR=http://$SFMIRROR.dl.sourceforge.net/sourceforge/gnuwin32
 HOMEPAGE=http://gnuwin32.sourceforge.net/packages/$PACKAGE.htm
 SRCINFO=$PACKAGE-gnuwin32-homepage.txt
+DOWNLOAD=http://gnuwin32.sourceforge.net/downlinks/$PACKAGE-lib-zip.php
+DLINFO=$PACKAGE-gnuwin32-download.html
 
 
 # download package information
@@ -75,11 +77,16 @@ echo downloading: $HOMEPAGE
 w3m -dump -cols 70 $HOMEPAGE >$SRCINFO
 
 echo reading: $SRCINFO
-VERSION=`sed -n 9p $SRCINFO`
-SRCPKG=$PACKAGE-$VERSION-lib.zip
-SRCDIR=win32-$PACKAGE-$VERSION
+VERSION=`cat $SRCINFO | sed -n '/^Version$/,$ p' | sed -n 3p`
 
 echo current version of $PACKAGE: $VERSION
+
+echo downloading: $DOWNLOAD
+wget -O - $DOWNLOAD >$DLINFO || exit 1
+
+echo reading: $DLINFO
+SRCPKG=`cat $DLINFO | sed -n 's!.*"/gnuwin32/\('$PACKAGE-$VERSION'-[^"]*lib\.zip\)".*!\1!p' | sed -n 1p | xargs echo`
+SRCDIR=win32-$PACKAGE-$VERSION
 
 
 # download zip package
@@ -139,11 +146,10 @@ Standards-Version: 3.6.1
 Package: $DEBPACKAGE
 Architecture: all
 Depends: mingw32
-Description: `sed -n '5s/[^:]*: //p' $SRCINFO`
+Description: `cat $SRCINFO | sed -n '/:/,$ {/^$/ q ; s/[^:]*: // ; p}' | xargs echo`
  GnuWin32 port of `sed -n 5p $SRCINFO`
  .
-`sed -n '13~1 {/^$/q ; s/\(.*\)/ \1/p}' $SRCINFO`
- .
+`cat $SRCINFO | sed -n '/^Description$/,$ p' | sed -n '3~1 {/^Homepage$/ q ; s/^$/./ ; s/^/ / ; p}'`
  Homepage: $HOMEPAGE
 EOF
 
