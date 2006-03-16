@@ -65,7 +65,7 @@ shift 5  # dpkg-buildpackage options are now in $@
 
 MIRROR=http://$SFMIRROR.dl.sourceforge.net/sourceforge/gnuwin32
 HOMEPAGE=http://gnuwin32.sourceforge.net/packages/$PACKAGE.htm
-SRCINFO=$PACKAGE-gnuwin32-homepage.txt
+SRCINFO=$PACKAGE-gnuwin32-homepage
 DOWNLOAD=http://gnuwin32.sourceforge.net/downlinks/$PACKAGE-lib-zip.php
 DLINFO=$PACKAGE-gnuwin32-download.html
 
@@ -74,10 +74,13 @@ DLINFO=$PACKAGE-gnuwin32-download.html
 #
 
 echo downloading: $HOMEPAGE
-w3m -dump -cols 70 $HOMEPAGE >$SRCINFO
+wget -O - $HOMEPAGE >$SRCINFO.html || exit 1
 
-echo reading: $SRCINFO
-VERSION=`cat $SRCINFO | sed -n '/^Version$/,$ p' | sed -n 3p`
+echo converting: $SRCINFO.html "->" $SRCINFO.txt
+w3m -dump -cols 70 $SRCINFO.html >$SRCINFO.txt
+
+echo reading: $SRCINFO.txt
+VERSION=`cat $SRCINFO.txt | sed -n '/^Version$/,$ p' | sed -n 3p`
 
 echo current version of $PACKAGE: $VERSION
 
@@ -146,12 +149,12 @@ Standards-Version: 3.6.1
 Package: $DEBPACKAGE-dev
 Architecture: all
 Depends: mingw32
-Description: `cat $SRCINFO | sed -n '/:/,$ {/^$/ q ; s/[^:]*: // ; p}' | xargs echo`
- GnuWin32 port of `sed -n 5p $SRCINFO`
+Description: `cat $SRCINFO.txt | sed -n '/:/,$ {/^$/ q ; s/[^:]*: // ; p}' | xargs echo`
+ GnuWin32 port of `cat $SRCINFO.txt | sed -n 5p`
  .
  Package: $SRCPKG
  .
-`cat $SRCINFO | sed -n '/^Description$/,$ p' | sed -n '3~1 {/^Homepage$/ q ; s/^$/./ ; s/^/ / ; p}'`
+`cat $SRCINFO.txt | sed -n '/^Description$/,$ p' | sed -n '3~1 {/^Homepage$/ q ; s/^$/./ ; s/^/ / ; p}'`
  Homepage: $HOMEPAGE
 EOF
 
