@@ -196,7 +196,9 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	\$(UNZIP) -d debian/$DEBPACKAGE-dev/usr/i586-mingw32msvc $SRCPKG 'include/*' 'lib/*'
+	\$(UNZIP) -d debian/$DEBPACKAGE-dev/usr/i586-mingw32msvc $SRCPKG 'include/*'
+	\$(UNZIP) -d debian/$DEBPACKAGE-dev/usr/i586-mingw32msvc $SRCPKG 'lib/*'
+	-\$(UNZIP) -d debian/$DEBPACKAGE-dev/usr/i586-mingw32msvc $SRCPKG 'share/*'
 
 binary-indep: build install
 	dh_testdir
