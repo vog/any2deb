@@ -1,4 +1,4 @@
-VERSION=1.1
+VERSION=1.2
 PKG=any2deb-$(VERSION)
 SRC=any2deb gnuwin32-lib2deb gnuwin32-fetchlibs Makefile
 

@@ -24,7 +24,7 @@
 
 cat <<EOF
 
-    gnuwin32-fetchlibs - 1.1
+    gnuwin32-fetchlibs - 1.2
     ========================
 
 * download the package list from GnuWin32

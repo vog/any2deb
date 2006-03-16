@@ -29,7 +29,7 @@ if test -z "$5"
 then
 cat <<EOF
 
-    gnuwin32-lib2deb - 1.1
+    gnuwin32-lib2deb - 1.2
     ======================
 
 Download a library from GnuWin32 and
@@ -224,5 +224,18 @@ cd $SRCDIR
 dpkg-buildpackage -rfakeroot -D "$@" || exit 1
 cd ..
 
+
+# clean up
+#
+
+echo removing: $SRCINFO.html
+rm -f $SRCINFO.html
+
+echo removing: $SRCINFO.txt
+rm -f $SRCINFO.txt
+
+echo removing: $DLINFO
+rm -f $DLINFO
+
 echo removing: $SRCDIR/
-rm -rf $SRCDIR
+rm -f -r $SRCDIR
