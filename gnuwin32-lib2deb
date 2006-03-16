@@ -171,7 +171,7 @@ EOF
 
 echo creating: $SRCDIR/debian/dirs
 cat >$SRCDIR/debian/dirs <<EOF
-usr/i586-mingw32msv
+usr/i586-mingw32msvc
 EOF
 
 echo creating: $SRCDIR/debian/rules
