@@ -74,7 +74,7 @@ DLINFO=$PACKAGE-gnuwin32-download.html
 #
 
 echo downloading: $HOMEPAGE
-wget -O - $HOMEPAGE >$SRCINFO.html || exit 1
+wget -nv -O - $HOMEPAGE >$SRCINFO.html || exit 1
 
 echo converting: $SRCINFO.html "->" $SRCINFO.txt
 w3m -dump -cols 70 $SRCINFO.html >$SRCINFO.txt
@@ -85,7 +85,7 @@ VERSION=`cat $SRCINFO.txt | sed -n '/^Version$/,$ p' | sed -n 3p`
 echo current version of $PACKAGE: $VERSION
 
 echo downloading: $DOWNLOAD
-wget -O - $DOWNLOAD >$DLINFO || exit 1
+wget -nv -O - $DOWNLOAD >$DLINFO || exit 1
 
 echo reading: $DLINFO
 SRCPKG=`cat $DLINFO | sed -n 's!.*"/gnuwin32/\('$PACKAGE-$VERSION'-[^"]*lib\.zip\)".*!\1!p' | sed -n 1p | xargs echo`
@@ -102,7 +102,7 @@ then
     exit 0
 else
     echo downloading: $MIRROR/$SRCPKG
-    wget -nc $MIRROR/$SRCPKG \
+    wget -nv $MIRROR/$SRCPKG \
     || { rm -f $SRCPKG; exit 1; }
 fi
 
