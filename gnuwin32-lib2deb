@@ -124,7 +124,7 @@ mkdir $SRCDIR/debian
 
 echo creating: $SRCDIR/debian/changelog
 cat >$SRCDIR/debian/changelog <<EOF
-$DEBPACKAGE ($VERSION-1) unstable; urgency=low
+$DEBPACKAGE ($VERSION-1gnuwin32) unstable; urgency=low
 
   * Initial Release.
 
