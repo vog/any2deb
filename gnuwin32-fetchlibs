@@ -70,6 +70,6 @@ A2="\$EMAIL \$SFMIRROR \$BUILDPACKAGE"
 EOF
 cat gnuwin32-list-libraries.txt | while read pkg
 do
-    echo "#gnuwin32-lib2deb $pkg	win32-$pkg-dev	\"\$A1\" \$A2 || exit 1"
+    echo "#gnuwin32-lib2deb $pkg	win32-$pkg	\"\$A1\" \$A2 || exit 1"
 done
 )>gnuwin32-updateall.sh.templ

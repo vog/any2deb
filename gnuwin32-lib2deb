@@ -44,7 +44,7 @@ Requires:
     w3m, wget, debhelper, fakeroot
 
 Example:
-    gnuwin32-lib2deb zlib win32-zlib1-dev "Admin" "root@localhost" \\
+    gnuwin32-lib2deb zlib win32-zlib1 "Admin" "root@localhost" \\
                      heanet -b -uc
 
 EOF
@@ -86,7 +86,7 @@ wget -O - $DOWNLOAD >$DLINFO || exit 1
 
 echo reading: $DLINFO
 SRCPKG=`cat $DLINFO | sed -n 's!.*"/gnuwin32/\('$PACKAGE-$VERSION'-[^"]*lib\.zip\)".*!\1!p' | sed -n 1p | xargs echo`
-SRCDIR=win32-$PACKAGE-$VERSION
+SRCDIR=$DEBPACKAGE-$VERSION
 
 
 # download zip package
@@ -121,7 +121,7 @@ mkdir $SRCDIR/debian
 
 echo creating: $SRCDIR/debian/changelog
 cat >$SRCDIR/debian/changelog <<EOF
-win32-$PACKAGE ($VERSION-1) unstable; urgency=low
+$DEBPACKAGE ($VERSION-1) unstable; urgency=low
 
   * Initial Release.
 
@@ -136,18 +136,20 @@ EOF
 
 echo creating: $SRCDIR/debian/control
 cat >$SRCDIR/debian/control <<EOF
-Source: win32-$PACKAGE
+Source: $DEBPACKAGE
 Section: libdevel
 Priority: optional
 Maintainer: $FULLNAME <$EMAIL>
 Build-Depends: debhelper (>= 4.0.0), unzip
 Standards-Version: 3.6.1
 
-Package: $DEBPACKAGE
+Package: $DEBPACKAGE-dev
 Architecture: all
 Depends: mingw32
 Description: `cat $SRCINFO | sed -n '/:/,$ {/^$/ q ; s/[^:]*: // ; p}' | xargs echo`
  GnuWin32 port of `sed -n 5p $SRCINFO`
+ .
+ Package: $SRCPKG
  .
 `cat $SRCINFO | sed -n '/^Description$/,$ p' | sed -n '3~1 {/^Homepage$/ q ; s/^$/./ ; s/^/ / ; p}'`
  Homepage: $HOMEPAGE
@@ -188,7 +190,7 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	\$(UNZIP) -d debian/$DEBPACKAGE/usr/i586-mingw32msvc $SRCPKG 'include/*' 'lib/*'
+	\$(UNZIP) -d debian/$DEBPACKAGE-dev/usr/i586-mingw32msvc $SRCPKG 'include/*' 'lib/*'
 
 binary-indep: build install
 	dh_testdir
