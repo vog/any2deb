@@ -154,7 +154,10 @@ Description: `cat $SRCINFO.txt | sed -n '/:/,$ {/^$/ q ; s/[^:]*: // ; p}' | xar
  .
  Package: $SRCPKG
  .
-`cat $SRCINFO.txt | sed -n '/^Description$/,$ p' | sed -n '3~1 {/^Homepage$/ q ; s/^$/./ ; s/^/ / ; p}'`
+EOF
+cat $SRCINFO.txt | sed -n '/^Description$/,$ p' | sed -n '3~1 {/^Homepage$/ q ; s/^$/./ ; s/^/ / ; p}' \
+>>$SRCDIR/debian/control
+cat >>$SRCDIR/debian/control <<EOF
  Homepage: $HOMEPAGE
 EOF
 
