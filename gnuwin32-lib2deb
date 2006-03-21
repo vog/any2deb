@@ -101,6 +101,8 @@ if test -f $SRCPKG
 then
     echo "$SRCPKG alreads exists."
     echo "Nothing to do."
+    echo removing: $SRCINFO.html, $SRCINFO.txt, $DLINFO
+    rm -f $SRCINFO.html $SRCINFO.txt $DLINFO
     exit 0
 else
     echo downloading: $MIRROR/$SRCPKG
@@ -230,14 +232,8 @@ cd ..
 # clean up
 #
 
-echo removing: $SRCINFO.html
-rm -f $SRCINFO.html
-
-echo removing: $SRCINFO.txt
-rm -f $SRCINFO.txt
-
-echo removing: $DLINFO
-rm -f $DLINFO
+echo removing: $SRCINFO.html, $SRCINFO.txt, $DLINFO
+rm -f $SRCINFO.html $SRCINFO.txt $DLINFO
 
 echo removing: $SRCDIR/
 rm -f -r $SRCDIR
