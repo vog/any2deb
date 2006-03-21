@@ -36,12 +36,12 @@ Download a library from GnuWin32 and
 create a Debian package for cross compiling to it.
 
 
+Requires:
+    w3m, wget, debhelper, fakeroot, [unzip]
+
 Syntax:
     gnuwin32-lib2deb <pkgname> <deb-pkgname> <full name> <email> \\
                      <sf-mirror> [<dpkg-buildpackage options>]
-
-Requires:
-    w3m, wget, debhelper, fakeroot
 
 Example:
     gnuwin32-lib2deb zlib win32-zlib1 "Admin" "root@localhost" \\
