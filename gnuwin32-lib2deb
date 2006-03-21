@@ -145,7 +145,7 @@ echo creating: $SRCDIR/debian/control
 cat >$SRCDIR/debian/control <<EOF
 Source: $DEBPACKAGE
 Section: libdevel
-Priority: optional
+Priority: extra
 Maintainer: $FULLNAME <$EMAIL>
 Build-Depends: debhelper (>= 4.0.0), unzip
 Standards-Version: 3.6.1
