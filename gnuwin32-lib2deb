@@ -82,14 +82,16 @@ w3m -dump -cols 70 $SRCINFO.html >$SRCINFO.txt
 echo reading: $SRCINFO.txt
 VERSION=`cat $SRCINFO.txt | sed -n '/^Version$/,$ p' | sed -n 3p`
 
-echo current version of $PACKAGE: $VERSION
-
 echo downloading: $DOWNLOAD
 wget -nv -O - $DOWNLOAD >$DLINFO || exit 1
 
 echo reading: $DLINFO
 SRCPKG=`cat $DLINFO | sed -n 's!.*"/gnuwin32/\('$PACKAGE-$VERSION'-[^"]*lib\.zip\)".*!\1!p' | sed -n 1p | xargs echo`
+RELEASE=`echo $SRCPKG | sed -n 's/'$PACKAGE-$VERSION'-\([^-]\+\)-lib\.zip/\1/p'`
+test -z "$RELEASE" && RELEASE=0
 SRCDIR=$DEBPACKAGE-$VERSION
+
+echo "current version of $PACKAGE: $VERSION - GnuWin32 release: $RELEASE"
 
 
 # download zip package
@@ -124,7 +126,7 @@ mkdir $SRCDIR/debian
 
 echo creating: $SRCDIR/debian/changelog
 cat >$SRCDIR/debian/changelog <<EOF
-$DEBPACKAGE ($VERSION-1gnuwin32) unstable; urgency=low
+$DEBPACKAGE ($VERSION-${RELEASE}gnuwin32) unstable; urgency=low
 
   * Initial Release.
 
