@@ -99,16 +99,16 @@ echo "current version of $PACKAGE: $VERSION - GnuWin32 release: $RELEASE"
 
 if test -f $SRCPKG
 then
-    echo "$SRCPKG alreads exists."
+    echo $SRCPKG alreads exists.
     echo "Nothing to do."
     echo removing: $SRCINFO.html, $SRCINFO.txt, $DLINFO
     rm -f $SRCINFO.html $SRCINFO.txt $DLINFO
     exit 0
-else
-    echo downloading: $MIRROR/$SRCPKG
-    wget -nv $MIRROR/$SRCPKG \
-    || { rm -f $SRCPKG; exit 1; }
 fi
+
+echo downloading: $MIRROR/$SRCPKG
+wget -nv $MIRROR/$SRCPKG \
+|| { rm -f $SRCPKG; exit 1; }
 
 
 # build deb package
