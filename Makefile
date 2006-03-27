@@ -1,6 +1,7 @@
 VERSION=1.2
 PKG=any2deb-$(VERSION)
-SRC=any2deb gnuwin32-lib2deb gnuwin32-fetchlibs Makefile
+SCRIPTS=any2deb gnuwin32-lib2deb gnuwin32-fetchlibs
+SRC=$(SCRIPTS) Makefile
 
 MKDIR=mkdir
 CP=cp -a
@@ -13,8 +14,8 @@ BINDIR=$(DESTDIR)/bin
 all:
 
 install:
-	$(INSTALL) -m 0755 any2deb $(BINDIR)/
-	$(INSTALL) -m 0755 gnuwin32-lib2deb $(BINDIR)/
+	for file in $(SCRIPTS); do \
+	    $(INSTALL) -m 0755 $$file $(BINDIR)/ ; done
 
 dist: $(PKG).tar.gz
 
