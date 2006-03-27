@@ -68,6 +68,7 @@ HOMEPAGE=http://gnuwin32.sourceforge.net/packages/$PACKAGE.htm
 SRCINFO=$PACKAGE-gnuwin32-homepage
 DOWNLOAD=http://gnuwin32.sourceforge.net/downlinks/$PACKAGE-lib-zip.php
 DLINFO=$PACKAGE-gnuwin32-download.html
+PREFIX=usr/i586-mingw32msvc
 
 
 # download package information
@@ -175,7 +176,7 @@ EOF
 
 echo creating: $SRCDIR/debian/dirs
 cat >$SRCDIR/debian/dirs <<EOF
-usr/i586-mingw32msvc
+$PREFIX
 EOF
 
 echo creating: $SRCDIR/debian/rules
@@ -200,9 +201,9 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	\$(UNZIP) -d debian/$DEBPACKAGE-dev/usr/i586-mingw32msvc $SRCPKG 'include/*'
-	\$(UNZIP) -d debian/$DEBPACKAGE-dev/usr/i586-mingw32msvc $SRCPKG 'lib/*'
-	-\$(UNZIP) -d debian/$DEBPACKAGE-dev/usr/i586-mingw32msvc $SRCPKG 'share/*'
+	\$(UNZIP) -d debian/$DEBPACKAGE-dev/$PREFIX $SRCPKG 'include/*'
+	\$(UNZIP) -d debian/$DEBPACKAGE-dev/$PREFIX $SRCPKG 'lib/*'
+	-\$(UNZIP) -d debian/$DEBPACKAGE-dev/$PREFIX $SRCPKG 'share/*'
 
 binary-indep: build install
 	dh_testdir
