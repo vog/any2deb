@@ -25,8 +25,7 @@
 # syntax check
 #
 
-if test -z "$5"
-then
+[ "$5" ] || {
 cat <<EOF
 
     gnuwin32-lib2deb - 1.2
@@ -49,7 +48,7 @@ Example:
 
 EOF
 exit 1
-fi
+}
 
 
 # read parameters
@@ -57,8 +56,8 @@ fi
 
 PACKAGE=$1
 DEBPACKAGE=$2
-FULLNAME="$3"
-EMAIL="$4"
+FULLNAME=$3
+EMAIL=$4
 SFMIRROR=$5
 
 shift 5  # dpkg-buildpackage options are now in $@
@@ -74,22 +73,22 @@ PREFIX=usr/i586-mingw32msvc
 # download package information
 #
 
-echo downloading: $HOMEPAGE
+echo "downloading: $HOMEPAGE"
 wget -nv -O - $HOMEPAGE >$SRCINFO.html || exit 1
 
-echo converting: $SRCINFO.html "->" $SRCINFO.txt
+echo "converting: $SRCINFO.html -> $SRCINFO.txt"
 w3m -dump -cols 70 $SRCINFO.html >$SRCINFO.txt
 
-echo reading: $SRCINFO.txt
+echo "reading: $SRCINFO.txt"
 VERSION=`cat $SRCINFO.txt | sed -n '/^Version$/,$ p' | sed -n 3p`
 
-echo downloading: $DOWNLOAD
+echo "downloading: $DOWNLOAD"
 wget -nv -O - $DOWNLOAD >$DLINFO || exit 1
 
-echo reading: $DLINFO
+echo "reading: $DLINFO"
 SRCPKG=`cat $DLINFO | sed -n 's!.*"/gnuwin32/\('$PACKAGE-$VERSION'-[^"]*lib\.zip\)".*!\1!p' | sed -n 1p | xargs echo`
 RELEASE=`echo $SRCPKG | sed -n 's/'$PACKAGE-$VERSION'-\([^-]\+\)-lib\.zip/\1/p'`
-test -z "$RELEASE" && RELEASE=0
+[ "$RELEASE" ] || RELEASE=0
 SRCDIR=$DEBPACKAGE-$VERSION
 
 echo "current version of $PACKAGE: $VERSION - GnuWin32 release: $RELEASE"
@@ -98,36 +97,37 @@ echo "current version of $PACKAGE: $VERSION - GnuWin32 release: $RELEASE"
 # download zip package
 #
 
-if test -f $SRCPKG
-then
+[ -f $SRCPKG ] && {
     echo $SRCPKG alreads exists.
     echo "Nothing to do."
-    echo removing: $SRCINFO.html, $SRCINFO.txt, $DLINFO
+    echo "removing: $SRCINFO.html, $SRCINFO.txt, $DLINFO"
     rm -f $SRCINFO.html $SRCINFO.txt $DLINFO
     exit 0
-fi
+}
 
-echo downloading: $MIRROR/$SRCPKG
-wget -nv $MIRROR/$SRCPKG \
-|| { rm -f $SRCPKG; exit 1; }
+echo "downloading: $MIRROR/$SRCPKG"
+wget -nv $MIRROR/$SRCPKG || {
+    rm -f $SRCPKG
+    exit 1
+}
 
 
 # build deb package
 #
 
-echo removing: $SRCDIR/
+echo "removing: $SRCDIR/"
 rm -rf $SRCDIR
 
-echo creating: $SRCDIR/
+echo "creating: $SRCDIR/"
 mkdir $SRCDIR || exit 1
 
-echo creating: $SRCDIR/$SRCPKG
+echo "creating: $SRCDIR/$SRCPKG"
 cp $SRCPKG $SRCDIR
 
-echo creating: $SRCDIR/debian/
+echo "creating: $SRCDIR/debian/"
 mkdir $SRCDIR/debian
 
-echo creating: $SRCDIR/debian/changelog
+echo "creating: $SRCDIR/debian/changelog"
 cat >$SRCDIR/debian/changelog <<EOF
 $DEBPACKAGE ($VERSION-${RELEASE}gnuwin32) unstable; urgency=low
 
@@ -137,12 +137,12 @@ $DEBPACKAGE ($VERSION-${RELEASE}gnuwin32) unstable; urgency=low
 
 EOF
 
-echo creating: $SRCDIR/debian/compat
+echo "creating: $SRCDIR/debian/compat"
 cat >$SRCDIR/debian/compat <<EOF
 4
 EOF
 
-echo creating: $SRCDIR/debian/control
+echo "creating: $SRCDIR/debian/control"
 cat >$SRCDIR/debian/control <<EOF
 Source: $DEBPACKAGE
 Section: libdevel
@@ -166,7 +166,7 @@ cat >>$SRCDIR/debian/control <<EOF
  Homepage: $HOMEPAGE
 EOF
 
-echo creating: $SRCDIR/debian/copyright
+echo "creating: $SRCDIR/debian/copyright"
 cat >$SRCDIR/debian/copyright <<EOF
 This package was debianized by $FULLNAME <$EMAIL> on
 `date -R`.
@@ -174,12 +174,12 @@ This package was debianized by $FULLNAME <$EMAIL> on
 It was downloaded from: $HOMEPAGE
 EOF
 
-echo creating: $SRCDIR/debian/dirs
+echo "creating: $SRCDIR/debian/dirs"
 cat >$SRCDIR/debian/dirs <<EOF
 $PREFIX
 EOF
 
-echo creating: $SRCDIR/debian/rules
+echo "creating: $SRCDIR/debian/rules"
 cat >$SRCDIR/debian/rules <<EOF
 #!/usr/bin/make -f
 # -*- makefile -*-
@@ -233,8 +233,8 @@ cd ..
 # clean up
 #
 
-echo removing: $SRCINFO.html, $SRCINFO.txt, $DLINFO
+echo "removing: $SRCINFO.html, $SRCINFO.txt, $DLINFO"
 rm -f $SRCINFO.html $SRCINFO.txt $DLINFO
 
-echo removing: $SRCDIR/
+echo "removing: $SRCDIR/"
 rm -f -r $SRCDIR
