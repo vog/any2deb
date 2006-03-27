@@ -57,20 +57,46 @@ ARCH=$2
 shift 2  # dpkg-buildpackage options are now in $@
 
 
-# create Debian source directory
+# sanity checks
 #
 
 VERSION=`ls -1 -d "$SOURCE"*/ | sed -n '1 s!^'"$SOURCE"'-\(.*\)/$!\1! p'`
-[ "$VERSION" ] || {
-    echo "Unable to find the unpacked $SOURCE sources."
-    exit 1
+[ "$VERSION" ] || { cat <<EOF
+
+Unable to find the unpacked sources of:
+    $SOURCE
+
+EOF
+exit 1
 }
 
-[ -d "patch-$ARCH-$SOURCE" ] || {
-    echo "Unable to find the patch folder: patch-$ARCH-$SOURCE/"
-    echo "To get started, try debuild-cross-prepare."
-    exit 1
+[ -d "patch-$ARCH-$SOURCE" ] || { cat <<EOF
+
+Unable to find the patch folder:
+    patch-$ARCH-$SOURCE/
+
+To get started, try:
+    debuild-cross-prepare $SOURCE $ARCH
+
+EOF
+exit 1
 }
+
+MAINTAINER=`cat "patch-$ARCH-$SOURCE/debian/control" | sed -n 's/^Maintainer: \(.*\)/\1/p'`
+[ "$MAINTAINER" ] || { cat <<EOF
+
+You have to adjust at lest the "Maintainer:" field in:
+    patch-$ARCH-$SOURCE/debian/control
+
+Maintainer: Your Name <your@mail.address>
+
+EOF
+exit 1
+}
+
+
+# create Debian source directory
+#
 
 rm -rf "$ARCH-$SOURCE-$VERSION"
 cp -r "$SOURCE-$VERSION" "$ARCH-$SOURCE-$VERSION"
@@ -83,7 +109,6 @@ cp -r "patch-$ARCH-$SOURCE"/* "$ARCH-$SOURCE-$VERSION"
 
 cd "$ARCH-$SOURCE-$VERSION"
 
-MAINTAINER=`cat debian/control | sed -n 's/^Maintainer: \(.*\)/\1/p'`
 CHANGELOG=`cat debian/changelog`
 RELEASE=`echo "$CHANGELOG" | sed -n '1 s/^'"$SOURCE"' (\(.*\)).*/\1/ p'`
 cat >debian/changelog <<EOF
@@ -100,11 +125,17 @@ EOF
 # build Debian packages
 #
 
-dpkg-buildpackage -rfakeroot "$@" || {
-    echo "Unable to build the package."
-    echo "Please have a look into: $ARCH-$SOURCE-$VERSION/"
-    echo "and adjust the the patch folder: patch-$ARCH-$SOURCE/"
-    exit 1
+dpkg-buildpackage -rfakeroot "$@" || { cat <<EOF
+
+Unable to build the package!
+
+Please have a look into:
+    $ARCH-$SOURCE-$VERSION/
+and adjust the files in your patch folder:
+    patch-$ARCH-$SOURCE/
+
+EOF
+exit 1
 }
 
 

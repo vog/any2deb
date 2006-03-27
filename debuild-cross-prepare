@@ -61,9 +61,13 @@ PREFIX=usr/$HOST
 #
 
 VERSION=`ls -1 -d "$SOURCE"*/ | sed -n '1 s!^'"$SOURCE"'-\(.*\)/$!\1! p'`
-[ "$VERSION" ] || {
-    echo "Unable to find the unpacked $SOURCE sources."
-    exit 1
+[ "$VERSION" ] || { cat <<EOF
+
+Unable to find the unpacked sources of:
+    $SOURCE
+
+EOF
+exit 1
 }
 
 
@@ -71,9 +75,16 @@ VERSION=`ls -1 -d "$SOURCE"*/ | sed -n '1 s!^'"$SOURCE"'-\(.*\)/$!\1! p'`
 #
 
 PATCHDIR="patch-$ARCH-$SOURCE"
-mkdir "$PATCHDIR" || {
-    echo "Package $SOURCE has already been prepared."
-    exit 1
+mkdir "$PATCHDIR" || { cat <<EOF
+
+Package $SOURCE has already been prepared. Please adjust the files in:
+    $PATCHDIR/debian/
+
+When you are done, try:
+    debuild-cross $SOURCE $ARCH -uc -us
+
+EOF
+exit 1
 }
 
 
@@ -99,7 +110,7 @@ cat >"$PATCHDIR/debian/control" <<EOF
 Source: $ARCH-$SOURCE
 Section: libdevel
 Priority: extra
-Maintainer: Nobody <nobody@nobody.invalid>
+Maintainer: 
 `echo "$CONTROL" | sed -n '/^Section:\|^Source:\|^Priority:\|^Maintainer:/ ! p ; /^$/ q'`
 
 Package: $ARCH-$DEVPACKAGE
@@ -113,4 +124,18 @@ cat >"$PATCHDIR/debian/$ARCH-$DEVPACKAGE.install" <<EOF
 $PREFIX/bin
 $PREFIX/include
 $PREFIX/lib
+EOF
+
+
+# done
+#
+
+cat <<EOF
+
+The patch folder is now prepared. Please adjust the files in:
+    $PATCHDIR/debian/
+
+When you are done, try:
+    debuild-cross $SOURCE $ARCH -uc -us
+
 EOF
