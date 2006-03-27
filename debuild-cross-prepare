@@ -88,7 +88,7 @@ cat >"$PATCHDIR/debian/rules" <<EOF
 
 # Cross compiling entries.
 export PATH := /$PREFIX/bin:\$(PATH)
-CONFIGURE_FLAGS=--prefix=/$PREFIX --build=\`dpkg-architecture -qDEB_BUILD_GNU_TYPE\` --host=$HOST
+CONFIGURE_CROSS_FLAGS=--prefix=/$PREFIX --build=\`dpkg-architecture -qDEB_BUILD_GNU_TYPE\` --host=$HOST
 `echo "$RULES" | sed -n '/^$/,$ p'`
 EOF
 chmod a+x "$PATCHDIR/debian/rules"

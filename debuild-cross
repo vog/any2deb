@@ -67,7 +67,7 @@ VERSION=`ls -1 -d "$SOURCE"*/ | sed -n '1 s!^'"$SOURCE"'-\(.*\)/$!\1! p'`
 }
 
 [ -d "patch-$ARCH-$SOURCE" ] || {
-    echo "Unable to find the patch folder: patch-$ARCH-$SOURCE"
+    echo "Unable to find the patch folder: patch-$ARCH-$SOURCE/"
     echo "To get started, try debuild-cross-prepare."
     exit 1
 }
