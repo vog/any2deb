@@ -26,14 +26,12 @@
 #
 
 [ "$4" ] || {
-VERSION="1.2"
-DESCRIPTION="Create Debian packages from ZIP and TAR files using alien."
 cat <<EOF
 
-    any2deb - $VERSION
+    any2deb - 1.2
     =============
 
-$DESCRIPTION
+Create Debian packages from ZIP and TAR files using alien.
 
 
 Syntax:
@@ -56,15 +54,15 @@ exit 1
 # read parameters
 #
 
-PACKAGE="$1"
-VERSION="$2"
-SOURCE="$3"
-PREFIX="./$4"
+PACKAGE=$1
+VERSION=$2
+SOURCE=$3
+PREFIX=./$4
 
 shift 4  # alien options are now in $@
 
-BUILD="build-$PACKAGE"
-TGZPACKAGE="$PACKAGE-$VERSION.tgz"
+BUILD=build-$PACKAGE
+TGZPACKAGE=$PACKAGE-$VERSION.tgz
 
 
 # initialize build folder
@@ -103,15 +101,15 @@ esac
 # determine real source folder
 #
 
-BUILD_SOURCE="$BUILD/source"
+BUILD_SOURCE=$BUILD/source
 SUBDIRS=`find "$BUILD_SOURCE" -type d -mindepth 1`
-[ -n "$SUBDIRS" -a "`echo "$SUBDIRS" | wc -l`" = 1 ] && BUILD_SOURCE="$SUBDIRS"
+[ -n "$SUBDIRS" -a "`echo "$SUBDIRS" | wc -l`" = 1 ] && BUILD_SOURCE=$SUBDIRS
 
 
 # build destination tree
 #
 
-BUILD_DEST="$BUILD/dest/$PREFIX"
+BUILD_DEST=$BUILD/dest/$PREFIX
 mkdir -p "$BUILD_DEST"
 rmdir "$BUILD_DEST"
 mv "$BUILD_SOURCE" "$BUILD_DEST"
