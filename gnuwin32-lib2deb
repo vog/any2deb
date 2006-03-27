@@ -37,7 +37,7 @@ create a Debian package for cross compiling to it.
 
 
 Requires:
-    w3m, wget, debhelper, fakeroot, [unzip]
+    w3m, wget, dpkg-dev, debhelper, fakeroot, [unzip]
 
 Syntax:
     gnuwin32-lib2deb <pkgname> <deb-pkgname> <full name> <email> \\
