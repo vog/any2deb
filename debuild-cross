@@ -77,7 +77,7 @@ cp -r "$SOURCE-$VERSION" "$ARCH-$SOURCE-$VERSION"
 cp -r "patch-$ARCH-$SOURCE"/* "$ARCH-$SOURCE-$VERSION"
 
 [ -f "$ARCH-${SOURCE}_$VERSION.orig.tar.gz" ] || {
-    tar -x -f "${SOURCE}_$VERSION.orig.tar.gz"
+    tar -xz -f "${SOURCE}_$VERSION.orig.tar.gz"
     mv "$SOURCE-$VERSION.orig" "$ARCH-$SOURCE-$VERSION.orig"
 }
 
