@@ -100,7 +100,12 @@ EOF
 # build Debian packages
 #
 
-dpkg-buildpackage -rfakeroot "$@"
+dpkg-buildpackage -rfakeroot "$@" || {
+    echo "Unable to build the package."
+    echo "Please have a look into: $ARCH-$SOURCE-$VERSION/"
+    echo "and adjust the the patch folder: patch-$ARCH-$SOURCE/"
+    exit 1
+}
 
 
 # clean up
