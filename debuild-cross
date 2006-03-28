@@ -101,6 +101,7 @@ rm -rf "$ARCH-$SOURCE-$VERSION"
 cp -r "$SOURCE-$VERSION" "$ARCH-$SOURCE-$VERSION"
 cp -r "patch-$ARCH-$SOURCE"/* "$ARCH-$SOURCE-$VERSION"
 
+[ -d "$ARCH-${SOURCE}_$VERSION.orig" ] || \
 [ -f "$ARCH-${SOURCE}_$VERSION.orig.tar.gz" ] || {
     ORIGDIR=`tar -tz -f "${SOURCE}_$VERSION.orig.tar.gz" | sed -n 1p`
     tar -xz -f "${SOURCE}_$VERSION.orig.tar.gz"
