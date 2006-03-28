@@ -98,6 +98,8 @@ cat >"$PATCHDIR/debian/rules" <<EOF
 
 # Cross compiling entries.
 export PATH := /$PREFIX/bin:\$(PATH)
+CC :=
+CXX :=
 CONFIGURE_CROSS_FLAGS=--prefix=/$PREFIX --build=\`dpkg-architecture -qDEB_BUILD_GNU_TYPE\` --host=$HOST
 `echo "$RULES" | sed -n '/^$/,$ p'`
 EOF
@@ -120,9 +122,9 @@ Architecture: all
 EOF
 
 cat >"$PATCHDIR/debian/$ARCH-$DEVPACKAGE.install" <<EOF
-$PREFIX/bin
-$PREFIX/include
-$PREFIX/lib
+$PREFIX/bin/*
+$PREFIX/include/*
+$PREFIX/lib/*
 EOF
 
 
