@@ -25,8 +25,7 @@
 # syntax check
 #
 
-[ "$5" ] || {
-cat <<EOF
+[ "$5" ] || { cat <<EOF
 
     gnuwin32-lib2deb - 1.2
     ======================
