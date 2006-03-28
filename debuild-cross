@@ -102,8 +102,9 @@ cp -r "$SOURCE-$VERSION" "$ARCH-$SOURCE-$VERSION"
 cp -r "patch-$ARCH-$SOURCE"/* "$ARCH-$SOURCE-$VERSION"
 
 [ -f "$ARCH-${SOURCE}_$VERSION.orig.tar.gz" ] || {
+    ORIGDIR=`tar -tz -f "${SOURCE}_$VERSION.orig.tar.gz" | sed -n 1p`
     tar -xz -f "${SOURCE}_$VERSION.orig.tar.gz"
-    mv "$SOURCE-$VERSION.orig" "$ARCH-$SOURCE-$VERSION.orig"
+    mv "$ORIGDIR" "$ARCH-$SOURCE-$VERSION.orig"
 }
 
 cd "$ARCH-$SOURCE-$VERSION"
