@@ -52,13 +52,14 @@ exit 1
 
 SOURCE=$1
 ARCH=$2
-HOST=`echo "$3" | sed 's!^/!!'`
+HOST=$3
 PREFIX=usr/$HOST
 
 
 # look for source folder
 #
 
+echo "looking for: $SOURCE source package"
 VERSION=`ls -1 -d "$SOURCE"*/ | sed -n '1 s!^'"$SOURCE"'-\(.*\)/$!\1! p'`
 [ "$VERSION" ] || { cat <<EOF
 
@@ -68,11 +69,13 @@ Unable to find the unpacked sources of:
 EOF
 exit 1
 }
+echo "found: version $VERSION"
 
 
 # create patch folder
 #
 
+echo "creating: patch folder"
 PATCHDIR="patch-$ARCH-$SOURCE"
 mkdir "$PATCHDIR" || { cat <<EOF
 
@@ -90,9 +93,12 @@ exit 1
 # prepare patch folder
 #
 
+echo "creating: debian/"
 mkdir "$PATCHDIR/debian"
 
+echo "reading: $SOURCE-$VERSION/debian/rules"
 RULES=`cat "$SOURCE-$VERSION/debian/rules"`
+echo "creating: debian/rules"
 cat >"$PATCHDIR/debian/rules" <<EOF
 `echo "$RULES" | sed -n '1,/^$/ p'`
 
@@ -100,13 +106,16 @@ cat >"$PATCHDIR/debian/rules" <<EOF
 export PATH := /$PREFIX/bin:\$(PATH)
 CC :=
 CXX :=
-CONFIGURE_CROSS_FLAGS=--prefix=/$PREFIX --build=\`dpkg-architecture -qDEB_BUILD_GNU_TYPE\` --host=$HOST
+CONFIGURE_CROSS_FLAGS := --prefix=/$PREFIX --build=\`dpkg-architecture -qDEB_BUILD_GNU_TYPE\` --host=$HOST
 `echo "$RULES" | sed -n '/^$/,$ p'`
 EOF
 chmod a+x "$PATCHDIR/debian/rules"
 
+echo "reading: $SOURCE-$VERSION/debian/control"
 CONTROL=`cat "$SOURCE-$VERSION/debian/control"`
 DEVPACKAGE=`echo "$CONTROL" | sed -n 's/^Package: \(.*-dev\)$/\1/p'`
+echo "development package name: $DEVPACKAGE"
+echo "creating: debian/control"
 cat >"$PATCHDIR/debian/control" <<EOF
 Source: $ARCH-$SOURCE
 Section: libdevel
@@ -121,8 +130,10 @@ Architecture: all
  This package contains the files needed for $ARCH cross compiling.
 EOF
 
+echo "creating: debian/$ARCH-$DEVPACKAGE.install"
 cat >"$PATCHDIR/debian/$ARCH-$DEVPACKAGE.install" <<EOF
 $PREFIX/bin/*-config
+$PREFIX/bin/*.dll
 $PREFIX/include/*
 $PREFIX/lib/*
 EOF
