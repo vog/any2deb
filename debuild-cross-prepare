@@ -113,7 +113,7 @@ chmod a+x "$PATCHDIR/debian/rules"
 
 echo "reading: $SOURCE-$VERSION/debian/control"
 CONTROL=`cat "$SOURCE-$VERSION/debian/control"`
-DEVPACKAGE=`echo "$CONTROL" | sed -n 's/^Package: \(.*-dev\)$/\1/p'`
+DEVPACKAGE=`echo "$CONTROL" | sed -n 's/^Package: \(.*-dev\)$/\1/p' | sed -n '1p'`
 echo "development package name: $DEVPACKAGE"
 echo "creating: debian/control"
 cat >"$PATCHDIR/debian/control" <<EOF
