@@ -59,6 +59,7 @@ shift 2  # dpkg-buildpackage options are now in $@
 # sanity checks
 #
 
+echo "looking for: $SOURCE source package"
 VERSION=`ls -1 -d "$SOURCE"*/ | sed -n '1 s!^'"$SOURCE"'-\(.*\)/$!\1! p'`
 [ "$VERSION" ] || { cat <<EOF
 
@@ -68,7 +69,9 @@ Unable to find the unpacked sources of:
 EOF
 exit 1
 }
+echo "found: version $VERSION"
 
+echo "looking for: patch-$ARCH-$SOURCE"
 [ -d "patch-$ARCH-$SOURCE" ] || { cat <<EOF
 
 Unable to find the patch folder:
@@ -81,6 +84,7 @@ EOF
 exit 1
 }
 
+echo "checking: debian/control"
 MAINTAINER=`cat "patch-$ARCH-$SOURCE/debian/control" | sed -n 's/^Maintainer: \(.*\)/\1/p'`
 [ "$MAINTAINER" ] || { cat <<EOF
 
@@ -97,21 +101,33 @@ exit 1
 # create Debian source directory
 #
 
+echo "creating: $ARCH-$SOURCE-$VERSION"
 rm -rf "$ARCH-$SOURCE-$VERSION"
 cp -r "$SOURCE-$VERSION" "$ARCH-$SOURCE-$VERSION"
+
+echo "patching with: patch-$ARCH-$SOURCE"
 cp -r "patch-$ARCH-$SOURCE"/* "$ARCH-$SOURCE-$VERSION"
 
+echo "looking for: ${SOURCE}_$VERSION.orig"
 [ -d "$ARCH-${SOURCE}_$VERSION.orig" ] || \
 [ -f "$ARCH-${SOURCE}_$VERSION.orig.tar.gz" ] || {
+    echo "creating: ${SOURCE}_$VERSION.orig"
     ORIGDIR=`tar -tz -f "${SOURCE}_$VERSION.orig.tar.gz" | sed -n 1p`
-    tar -xz -f "${SOURCE}_$VERSION.orig.tar.gz"
-    mv "$ORIGDIR" "$ARCH-$SOURCE-$VERSION.orig"
+    TMPDIR=${SOURCE}_$VERSION.orig.tar.gz_extract
+    rm -rf "$TMPDIR"
+    mkdir "$TMPDIR" || exit 1
+    tar -xz -f "${SOURCE}_$VERSION.orig.tar.gz" -C "$TMPDIR" || exit 1
+    mv "$TMPDIR/$ORIGDIR" "$ARCH-$SOURCE-$VERSION.orig" || exit 1
+    rmdir "$TMPDIR" || exit 1
 }
 
 cd "$ARCH-$SOURCE-$VERSION"
 
+echo "reading: debian/changelog"
 CHANGELOG=`cat debian/changelog`
 RELEASE=`echo "$CHANGELOG" | sed -n '1 s/^'"$SOURCE"' (\(.*\)).*/\1/ p'`
+echo "current release: $RELEASE"
+echo "increasing release to: $RELEASE+win32.0"
 cat >debian/changelog <<EOF
 $ARCH-$SOURCE ($RELEASE+win32.0) unstable; urgency=low
 
@@ -126,6 +142,7 @@ EOF
 # build Debian packages
 #
 
+echo "building: Debian packages"
 dpkg-buildpackage -rfakeroot "$@" || { cat <<EOF
 
 Unable to build the package!
