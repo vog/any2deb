@@ -1,0 +1,89 @@
+                               any2deb
+                               =======
+
+    Collection of shell scripts to create simple Debian packages.
+
+
+Website:   http://www.profv.de/any2deb/
+License:   MIT License
+Copyright: (c) 2006  Volker Grabsch <vog@notjusthosting.com>
+
+
+
+any2deb
+=======
+
+Create Debian packages from ZIP and TAR files using alien.
+
+Syntax:
+    any2deb <package> <version> <source> <prefix> [<alien options>]
+
+Requires:
+    fakeroot, alien, findutils, [unzip, tar, gzip, bzip2]
+
+Examples:
+    any2deb win32-zlib1-dev 1.2.3 zlib-1.2.3-lib.zip /usr/i586-mingw32msvc
+
+    any2deb mplayer-codecs-essential 20050412 \
+            essential-20050412.tar.bz2 /usr/lib/codecs --fixperms
+
+
+debuild-cross
+=============
+
+Cross compile a Debian source package.
+
+Requires:
+    dpkg-dev, fakeroot, sed
+
+Syntax:
+    debuild-cross <debsrc-pkgname> <arch> [<dpkg-buildpackage options>]
+
+Example:
+    debuild-cross smpeg win32 -us -uc
+
+
+debuild-cross-prepare
+=====================
+
+Help to prepare a patch folder for use with debuild-cross.
+
+Requires:
+    sed
+
+Syntax:
+    debuild-cross-prepare <debsrc-pkgname> <arch> <host>
+
+Example:
+    debuild-cross-prepare smpeg win32 i586-mingw32msvc
+
+
+gnuwin32-fetchlibs
+==================
+
+* download the package list from GnuWin32
+* filter for library packages
+* create a template shell script to
+  automatically build their Debian packages
+
+Requires:
+    wget, grep, cut, sort
+
+
+gnuwin32-lib2deb
+================
+
+Download a library from GnuWin32 and
+create a Debian package for cross compiling to it.
+
+Requires:
+    w3m, wget, dpkg-dev, debhelper, fakeroot, [unzip]
+
+Syntax:
+    gnuwin32-lib2deb <pkgname> <deb-pkgname> <full name> <email> \
+                     <sf-mirror> [<dpkg-buildpackage options>]
+
+Example:
+    gnuwin32-lib2deb zlib win32-zlib1 "Admin" "root@localhost" \
+                     heanet -b -uc
+

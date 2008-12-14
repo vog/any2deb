@@ -1,7 +1,7 @@
 VERSION=1.2
 PKG=any2deb-$(VERSION)
 SCRIPTS=any2deb gnuwin32-lib2deb gnuwin32-fetchlibs debuild-cross debuild-cross-prepare
-SRC=$(SCRIPTS) Makefile
+SRC=$(SCRIPTS) Makefile README
 
 MKDIR=mkdir
 CP=cp -a
