@@ -56,7 +56,7 @@ exit 1
 PACKAGE=$1
 VERSION=$2
 SOURCE=$3
-PREFIX=./$4
+PREFIX=$4
 
 shift 4  # alien options are now in $@
 
@@ -108,7 +108,11 @@ SUBDIRS=`find "$BUILD_SOURCE" -mindepth 1 -type d`
 # build destination tree
 #
 
-BUILD_DEST=$BUILD/dest/$PREFIX
+case "$PREFIX" in
+    /)  BUILD_DEST=$BUILD/dest         ;;
+    /*) BUILD_DEST=$BUILD/dest$PREFIX  ;;
+    *)  BUILD_DEST=$BUILD/dest/$PREFIX ;;
+esac
 mkdir -p "$BUILD_DEST"
 rmdir "$BUILD_DEST"
 mv "$BUILD_SOURCE" "$BUILD_DEST"
